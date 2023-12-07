@@ -33,10 +33,10 @@ QueueHandle_t co2Queue;
 
 SimpleMenu *ui_ptr = nullptr;
 
-DigitalIoPin *upButton = nullptr;
-DigitalIoPin *backButton = nullptr;
-DigitalIoPin *okButton = nullptr;
-DigitalIoPin *downButton = nullptr;
+DigitalIoPin *upInput = nullptr;
+DigitalIoPin *backInput = nullptr;
+DigitalIoPin *okInput = nullptr;
+DigitalIoPin *downInput = nullptr;
 
 /* The following is required if runtime statistics are to be collected
  * Copy the code to the source file where other you initialize hardware */
@@ -68,10 +68,10 @@ static void userInput(void *params) {
 	while (true) {
 
 		// user is considered active for 15 seconds
-		bool pressedUp = upButton->read();
-		bool pressedBack = backButton->read();
-		bool pressedOk = okButton->read();
-		bool pressedDown = downButton->read();
+		bool pressedUp = upInput->read();
+		bool pressedBack = backInput->read();
+		bool pressedOk = okInput->read();
+		bool pressedDown = downInput->read();
 
 		if (pressedUp) {
 
@@ -106,7 +106,7 @@ static void userInput(void *params) {
 			xSemaphoreGive(uiMutex);
 		}
 
-		vTaskDelay(configTICK_RATE_HZ / 5);
+		vTaskDelay(configTICK_RATE_HZ / 10);
 	}
 }
 
@@ -158,35 +158,36 @@ void systemMonitor(void *pvParameters) {
 	}
 }
 
-void systemControl(void *pvParameters) {
-	GMP252 co2Probe;
-	HMP60 humTempProbe;
+/* // HARD FAULT - why?
+ void systemControl(void *pvParameters) {
+ GMP252 co2Probe;
+ HMP60 humTempProbe;
 
-	int co2Read;
-	int tempRead;
-	int rhRead;
+ int co2Read;
+ int tempRead;
+ int rhRead;
 
-	TickType_t lastRead = xTaskGetTickCount();
+ TickType_t lastRead = xTaskGetTickCount();
 
-	while (true) {
-		if ((xTaskGetTickCount() - lastRead) >= pdMS_TO_TICKS(5000)) {
-			co2Read = co2Probe.get_co2();
-			tempRead = humTempProbe.getTemperature();
-			rhRead = humTempProbe.getHumidity();
+ while (true) {
 
-			// Send the measurements to their respective queues
-			xQueueSend(co2Queue, &co2Read, portMAX_DELAY);
-			xQueueSend(temperatureQueue, &tempRead, portMAX_DELAY);
-			xQueueSend(humidityQueue, &rhRead, portMAX_DELAY);
+ co2Read = co2Probe.get_co2();
+ tempRead = humTempProbe.getTemperature();
+ rhRead = humTempProbe.getHumidity();
 
-			lastRead = xTaskGetTickCount();
-		}
+ // Send the measurements to their respective queues
+ xQueueSend(co2Queue, &co2Read, portMAX_DELAY);
+ xQueueSend(temperatureQueue, &tempRead, portMAX_DELAY);
+ xQueueSend(humidityQueue, &rhRead, portMAX_DELAY);
 
-		// CONTROL LOGIC BASED ON DIRECT MEASUREMENTS
+ lastRead = xTaskGetTickCount();
 
-		vTaskDelay(configTICK_RATE_HZ);
-	}
-}
+ // CONTROL LOGIC BASED ON DIRECT MEASUREMENTS
+
+ vTaskDelay(configTICK_RATE_HZ * 5);
+ }
+ }
+ */
 
 int main(void) {
 	prvSetupHardware();
@@ -197,10 +198,10 @@ int main(void) {
 	DigitalIoPin sw_a4(0, 6, DigitalIoPin::pullup, true);
 	DigitalIoPin sw_a5(0, 7, DigitalIoPin::pullup, true);
 
-	upButton = &sw_a5;
-	backButton = &sw_a4;
-	okButton = &sw_a3;
-	downButton = &sw_a2;
+	backInput = &sw_a5;
+	upInput = &sw_a4;
+	downInput = &sw_a3;
+	okInput = &sw_a2;
 
 	DigitalIoPin *rs = new DigitalIoPin(0, 29, DigitalIoPin::output);
 	DigitalIoPin *en = new DigitalIoPin(0, 9, DigitalIoPin::output);
@@ -235,8 +236,10 @@ int main(void) {
 	xTaskCreate(systemMonitor, "monitor", configMINIMAL_STACK_SIZE * 4, lcd,
 	tskIDLE_PRIORITY + 1, NULL);
 
-	xTaskCreate(systemControl, "control", configMINIMAL_STACK_SIZE * 6, NULL,
-	tskIDLE_PRIORITY + 2, NULL);
+	/*
+	 xTaskCreate(systemControl, "control", configMINIMAL_STACK_SIZE * 4, NULL,
+	 tskIDLE_PRIORITY + 2, NULL);
+	 */
 
 	/* Start the scheduler */
 	vTaskStartScheduler();

@@ -10,6 +10,7 @@
 
 #include "PropertyEdit.h"
 #include "LiquidCrystal.h"
+#include "eeprom.h"
 #include <string>
 
 class IntegerEdit: public PropertyEdit {
@@ -30,6 +31,8 @@ public:
 private:
 	void save();
 	void displayEditValue();
+	void saveToEEPROM();
+	void loadFromEEPROM();
 	LiquidCrystal *lcd;
 	std::string title;
 	std::string unit;

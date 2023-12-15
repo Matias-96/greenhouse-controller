@@ -24,7 +24,7 @@ bool MenuItem::event(menuEvent e) {
 			pe->setFocus(false);
 		}
 		else {
-			pe->setFocus(true);;
+			pe->setFocus(true);
 		}
 		break;
 	case back:

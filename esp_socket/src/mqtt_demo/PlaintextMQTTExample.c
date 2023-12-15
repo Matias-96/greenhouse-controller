@@ -132,7 +132,7 @@
  * The topic name starts with the client identifier to ensure that each demo
  * interacts with a unique topic name.
  */
-#define mqttexampleTOPIC                             democonfigCLIENT_IDENTIFIER "/example/topic"
+#define mqttexampleTOPIC                             democonfigCLIENT_IDENTIFIER "channels/2352903/publish" //"/example/topic" // channels/2352903/publish
 
 /**
  * @brief The number of topic filters to subscribe.
@@ -142,7 +142,7 @@
 /**
  * @brief The MQTT message published in this example.
  */
-#define mqttexampleMESSAGE                           "Hello World!"
+#define mqttexampleMESSAGE                           "field1=45&field2=60&status=MQTTPUBLISH"//"Hello World!"
 
 /**
  * @brief Dimensions a file scope buffer currently used to send and receive MQTT data
@@ -580,8 +580,12 @@ static void prvCreateMQTTConnectionWithBroker( MQTTContext_t * pxMQTTContext,
     /* The client identifier is used to uniquely identify this MQTT client to
      * the MQTT broker. In a production device the identifier can be something
      * unique, such as a device serial number. */
-    xConnectInfo.pClientIdentifier = democonfigCLIENT_IDENTIFIER;
-    xConnectInfo.clientIdentifierLength = ( uint16_t ) strlen( democonfigCLIENT_IDENTIFIER );
+    xConnectInfo.pClientIdentifier = "CjUiBzYtOy8WMTwpCg4YDyE";
+    xConnectInfo.clientIdentifierLength = ( uint16_t ) strlen( "CjUiBzYtOy8WMTwpCg4YDyE "); // CjUiBzYtOy8WMTwpCg4YDyE
+    xConnectInfo.pPassword = "DiqSrOOStPGhnUn5EIgsRGwM";
+    xConnectInfo.passwordLength = ( uint16_t ) strlen( "DiqSrOOStPGhnUn5EIgsRGwM" );
+    xConnectInfo.pUserName = "CjUiBzYtOy8WMTwpCg4YDyE";
+    xConnectInfo.userNameLength = ( uint16_t) strlen("CjUiBzYtOy8WMTwpCg4YDyE");
 
     /* Set MQTT keep-alive period. It is the responsibility of the application to ensure
      * that the interval between Control Packets being sent does not exceed the Keep Alive value.
@@ -638,8 +642,8 @@ static void prvMQTTSubscribeWithBackoffRetries( MQTTContext_t * pxMQTTContext )
     /* Subscribe to the mqttexampleTOPIC topic filter. This example subscribes to
      * only one topic and uses QoS0. */
     xMQTTSubscription[ 0 ].qos = MQTTQoS0;
-    xMQTTSubscription[ 0 ].pTopicFilter = mqttexampleTOPIC;
-    xMQTTSubscription[ 0 ].topicFilterLength = ( uint16_t ) strlen( mqttexampleTOPIC );
+    xMQTTSubscription[ 0 ].pTopicFilter = "channels/2352903/publish"; // channels/2352903/publish
+    xMQTTSubscription[ 0 ].topicFilterLength = ( uint16_t ) strlen( "channels/2352903/publish" );
 
     /* Initialize context for backoff retry attempts if SUBSCRIBE request fails. */
     BackoffAlgorithm_InitializeParams( &xRetryParams,
@@ -737,7 +741,7 @@ static void prvMQTTPublishToTopic( MQTTContext_t * pxMQTTContext )
     /* This demo uses QoS0. */
     xMQTTPublishInfo.qos = MQTTQoS0;
     xMQTTPublishInfo.retain = false;
-    xMQTTPublishInfo.pTopicName = mqttexampleTOPIC;
+    xMQTTPublishInfo.pTopicName = mqttexampleTOPIC; // channels/2352903/publish
     xMQTTPublishInfo.topicNameLength = ( uint16_t ) strlen( mqttexampleTOPIC );
 #if 0
     xMQTTPublishInfo.pPayload = mqttexampleMESSAGE;

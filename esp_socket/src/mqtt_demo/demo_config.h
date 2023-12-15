@@ -89,7 +89,7 @@ extern void vLoggingPrintf( const char * pcFormatString,
  *
  * #define democonfigMQTT_BROKER_ENDPOINT				"insert here."
  */
-#define democonfigMQTT_BROKER_ENDPOINT				"192.168.1.254"
+#define democonfigMQTT_BROKER_ENDPOINT				"mqtt3.thingspeak.com"
 
 /**
  * @brief The port to use for the demo.
